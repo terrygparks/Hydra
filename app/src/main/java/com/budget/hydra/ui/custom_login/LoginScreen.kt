@@ -10,6 +10,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.budget.hydra.R
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginScreen : AppCompatActivity() {
 
@@ -18,6 +19,9 @@ class LoginScreen : AppCompatActivity() {
     private lateinit var passwordField: EditText
     private lateinit var loginButton: Button
     private lateinit var registerButton: Button
+
+    // Firebase  global variables
+    private lateinit var auth: FirebaseAuth
 
     // Launcher for activities that give a result for registering the user
     private lateinit var registerUserRequest: ActivityResultLauncher<Intent>
@@ -39,6 +43,9 @@ class LoginScreen : AppCompatActivity() {
         loginButton = findViewById(R.id.login_button)
         registerButton = findViewById(R.id.register_button)
 
+        // Initialize Firebase Authentication
+        auth = FirebaseAuth.getInstance()
+
         // Initialize the RegisterUser activity result launcher
         registerUserRequest =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -46,6 +53,8 @@ class LoginScreen : AppCompatActivity() {
                 // If the RegisterUser activity finished successfully
                 if (it.resultCode == RESULT_OK) {
                     Toast.makeText(this, "Successfully logged in", Toast.LENGTH_LONG).show()
+                    setResult(RESULT_OK)
+                    finish()
                 } else {
                     Toast.makeText(this, "Something went wrong...", Toast.LENGTH_SHORT).show()
                 }
@@ -92,6 +101,16 @@ class LoginScreen : AppCompatActivity() {
             passwordField.error = getString(R.string.error_password_short)
             passwordField.requestFocus()
             return
+        }
+
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
+            if (it.isSuccessful) {
+                Toast.makeText(this, "Successfully logged in", Toast.LENGTH_LONG).show()
+                setResult(RESULT_OK)
+                finish()
+            } else {
+                Toast.makeText(this, "Email or password is incorrect", Toast.LENGTH_LONG).show()
+            }
         }
     }
 

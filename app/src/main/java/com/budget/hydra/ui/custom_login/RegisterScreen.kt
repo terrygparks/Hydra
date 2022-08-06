@@ -6,6 +6,10 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.budget.hydra.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 
 class RegisterScreen : AppCompatActivity() {
@@ -17,6 +21,10 @@ class RegisterScreen : AppCompatActivity() {
     private lateinit var verifyPasswordField: EditText
     private lateinit var registerButton: Button
     private lateinit var progressBar: ProgressBar
+
+    // Firebase  global variables
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     /**
      * Override the onCreate function in order to implement functionality for the activity.
@@ -36,6 +44,10 @@ class RegisterScreen : AppCompatActivity() {
         verifyPasswordField = findViewById(R.id.verify_register_password)
         registerButton = findViewById(R.id.register_screen_button)
         progressBar = findViewById(R.id.progress_bar)
+
+        // Initialize Firebase variables
+        auth = FirebaseAuth.getInstance()
+        db = Firebase.firestore
 
         // Button click listeners
         registerButton.setOnClickListener { registerUser() }
@@ -62,42 +74,42 @@ class RegisterScreen : AppCompatActivity() {
 
         // check if the user entered an email
         if (email.isEmpty()) {
-            emailField.error =  getString(R.string.error_email_required)
+            emailField.error = getString(R.string.error_email_required)
             emailField.requestFocus()
             return
         }
 
         // check if the user entered a valid email address
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailField.error =  getString(R.string.error_email_invalid)
+            emailField.error = getString(R.string.error_email_invalid)
             emailField.requestFocus()
             return
         }
 
         // check if the user entered a password
         if (password.isEmpty()) {
-            passwordField.error =  getString(R.string.error_password_required)
+            passwordField.error = getString(R.string.error_password_required)
             passwordField.requestFocus()
             return
         }
 
         // check if the password is greater than 6 characters
         if (password.length < 6) {
-            passwordField.error =  getString(R.string.error_password_short)
+            passwordField.error = getString(R.string.error_password_short)
             passwordField.requestFocus()
             return
         }
 
         // check if the user verified their password
         if (verifyPassword.isEmpty()) {
-            verifyPasswordField.error =  getString(R.string.error_password_verify)
+            verifyPasswordField.error = getString(R.string.error_password_verify)
             verifyPasswordField.requestFocus()
             return
         }
 
         // check if the passwords match each other
         if (password != verifyPassword) {
-            verifyPasswordField.error =  getString(R.string.error_password_match)
+            verifyPasswordField.error = getString(R.string.error_password_match)
             verifyPasswordField.requestFocus()
             return
         }
@@ -105,14 +117,38 @@ class RegisterScreen : AppCompatActivity() {
         // Show the progress bar as the app connects to the database
         progressBar.visibility = View.VISIBLE
 
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
+            // If creating a new user was successful
+            if (it.isSuccessful) {
 
-        // Hide the progress bar
-        progressBar.visibility = View.GONE
+                // User object
+                val user = hashMapOf<String, String>()
+                user["name"] = name
+                user["email"] = email
 
-        // Return to the previous activity with a successful result
-        setResult(RESULT_OK)
-        finish()
+                // Get the UID for the current user. ( !! - value is never or can't be null)
+                val currentUserUID = FirebaseAuth.getInstance().currentUser!!.uid
 
+                // Access "Users" collection, access the current user's document, and add the new user
+                db.collection("Users").document(currentUserUID).set(user).addOnSuccessListener {
+                    Toast.makeText(this, "User registered successfully", Toast.LENGTH_LONG)
+                        .show()
+
+                    // Failure listener for adding the user to the Firestore
+                }.addOnFailureListener {
+                    Toast.makeText(this, "Failed to add to DB", Toast.LENGTH_LONG).show()
+                }
+
+                // Failure to register the new user
+            } else {
+                Toast.makeText(this, "Failed to register user", Toast.LENGTH_LONG).show()
+            }
+
+            // Activity has completed, return to LoginScreen with successful result
+            progressBar.visibility = View.GONE
+            setResult(RESULT_OK)
+            finish()
+        }
 
     }
 }
