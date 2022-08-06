@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Hydra_Budget_Application.iml" filepath="$PROJECT_DIR$/.idea/modules/Hydra_Budget_Application.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Hydra_Budget_Application.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Hydra_Budget_Application.app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Hydra_Budget_Application.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Hydra_Budget_Application.app.androidTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Hydra_Budget_Application.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Hydra_Budget_Application.app.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Hydra_Budget_Application.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Hydra_Budget_Application.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HydraBudgetApplication.iml" filepath="$PROJECT_DIR$/.idea/modules/HydraBudgetApplication.iml" />
     </modules>
   </component>
 </project>
